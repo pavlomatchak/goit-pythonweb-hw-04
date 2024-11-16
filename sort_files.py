@@ -11,9 +11,12 @@ async def read_folder(source_folder: AsyncPath, output_folder: AsyncPath):
     logging.error(f"Source folder {source_folder} does not exist.")
     return
 
+  tasks = []
   async for item in source_folder.rglob("*"):
-    if await item.is_file():
-      await copy_file(item, output_folder)
+      if await item.is_file():
+          tasks.append(copy_file(item, output_folder))
+
+  await asyncio.gather(*tasks)
 
 async def copy_file(file_path: AsyncPath, output_folder: AsyncPath):
   extension = file_path.suffix.lower()
